@@ -1,0 +1,1184 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard do Aluno - S.U.M</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        :root {
+            --primary: #4361ee;
+            --primary-dark: #3a0ca3;
+            --primary-light: #4895ef;
+            --secondary: #f72585;
+            --accent: #4cc9f0;
+            --light: #f8f9fa;
+            --dark: #212529;
+            --gray: #6c757d;
+            --gray-light: #e9ecef;
+            --success: #4bb543;
+            --warning: #ffcc00;
+            --danger: #dc3545;
+            --gradient: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            --sidebar-width: 260px;
+            --header-height: 70px;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background-color: #f5f7fb;
+            color: var(--dark);
+            line-height: 1.6;
+        }
+        
+        /* Layout Principal */
+        .dashboard-container {
+            display: flex;
+            min-height: 100vh;
+        }
+        
+        /* Sidebar */
+        .sidebar {
+            width: var(--sidebar-width);
+            background: var(--gradient);
+            color: white;
+            position: fixed;
+            height: 100vh;
+            overflow-y: auto;
+            transition: all 0.3s ease;
+            z-index: 1000;
+        }
+        
+        .sidebar-header {
+            padding: 1.5rem;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .sidebar-header h1 {
+            font-size: 1.5rem;
+            font-weight: 700;
+        }
+        
+        .sidebar-menu {
+            padding: 1rem 0;
+        }
+        
+        .menu-section {
+            margin-bottom: 1.5rem;
+        }
+        
+        .menu-title {
+            padding: 0.5rem 1.5rem;
+            font-size: 0.8rem;
+            text-transform: uppercase;
+            color: rgba(255, 255, 255, 0.7);
+            letter-spacing: 1px;
+        }
+        
+        .menu-item {
+            display: flex;
+            align-items: center;
+            padding: 0.8rem 1.5rem;
+            color: white;
+            text-decoration: none;
+            transition: all 0.3s ease;
+        }
+        
+        .menu-item:hover, .menu-item.active {
+            background: rgba(255, 255, 255, 0.1);
+            border-left: 4px solid white;
+        }
+        
+        .menu-item i {
+            margin-right: 10px;
+            width: 20px;
+            text-align: center;
+        }
+        
+        /* Conteúdo Principal */
+        .main-content {
+            flex: 1;
+            margin-left: var(--sidebar-width);
+        }
+        
+        /* Header */
+        .header {
+            height: var(--header-height);
+            background: white;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 2rem;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+        
+        .search-bar {
+            display: flex;
+            align-items: center;
+            background: var(--gray-light);
+            border-radius: 50px;
+            padding: 0.5rem 1rem;
+            width: 300px;
+        }
+        
+        .search-bar input {
+            border: none;
+            background: transparent;
+            outline: none;
+            flex: 1;
+            padding: 0.3rem;
+        }
+        
+        .header-actions {
+            display: flex;
+            align-items: center;
+            gap: 1.5rem;
+        }
+        
+        .notification-btn, .messages-btn {
+            position: relative;
+            cursor: pointer;
+        }
+        
+        .badge {
+            position: absolute;
+            top: -5px;
+            right: -5px;
+            background: var(--danger);
+            color: white;
+            border-radius: 50%;
+            width: 18px;
+            height: 18px;
+            font-size: 0.7rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .user-profile {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            cursor: pointer;
+        }
+        
+        .user-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: var(--gradient);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: 600;
+        }
+        
+        /* Conteúdo do Dashboard */
+        .dashboard-content {
+            padding: 2rem;
+        }
+        
+        .page-title {
+            margin-bottom: 2rem;
+        }
+        
+        .page-title h2 {
+            font-size: 1.8rem;
+            color: var(--dark);
+            margin-bottom: 0.5rem;
+        }
+        
+        .breadcrumb {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            color: var(--gray);
+            font-size: 0.9rem;
+        }
+        
+        .breadcrumb a {
+            color: var(--primary);
+            text-decoration: none;
+        }
+        
+        /* Cards e Widgets */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+        
+        .stat-card {
+            background: white;
+            border-radius: 12px;
+            padding: 1.5rem;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+            display: flex;
+            align-items: center;
+        }
+        
+        .stat-icon {
+            width: 60px;
+            height: 60px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 1rem;
+            font-size: 1.5rem;
+        }
+        
+        .stat-content {
+            flex: 1;
+        }
+        
+        .stat-value {
+            font-size: 1.8rem;
+            font-weight: 700;
+            margin-bottom: 0.2rem;
+        }
+        
+        .stat-label {
+            color: var(--gray);
+            font-size: 0.9rem;
+        }
+        
+        .card {
+            background: white;
+            border-radius: 12px;
+            padding: 1.5rem;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+            margin-bottom: 2rem;
+        }
+        
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+        }
+        
+        .card-title {
+            font-size: 1.2rem;
+            font-weight: 600;
+        }
+        
+        .card-actions button {
+            background: var(--gray-light);
+            border: none;
+            padding: 0.5rem 1rem;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .card-actions button:hover {
+            background: var(--primary);
+            color: white;
+        }
+        
+        /* Mapeamento da Sala */
+        .classroom-mapping {
+            background: white;
+            border-radius: 12px;
+            padding: 1.5rem;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+            margin-bottom: 2rem;
+            position: relative;
+        }
+        
+        .mapping-controls {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+        }
+        
+        .mapping-controls button {
+            padding: 0.5rem 1rem;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            background: var(--gray-light);
+            transition: all 0.3s ease;
+        }
+        
+        .mapping-controls button.active {
+            background: var(--primary);
+            color: white;
+        }
+        
+        .classroom-layout {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            grid-template-rows: repeat(6, 1fr);
+            gap: 10px;
+            margin-bottom: 1.5rem;
+        }
+        
+        .seat {
+            background: var(--gray-light);
+            border-radius: 8px;
+            height: 80px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+        
+        .seat.empty {
+            background: #f0f0f0;
+        }
+        
+        .seat.occupied {
+            background: var(--primary-light);
+        }
+        
+        .seat.selected {
+            background: var(--primary);
+            color: white;
+        }
+        
+        .seat-content {
+            text-align: center;
+        }
+        
+        .seat-avatar {
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            background: var(--gradient);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 0.8rem;
+            margin: 0 auto 5px;
+        }
+        
+        .seat-name {
+            font-size: 0.7rem;
+            font-weight: 500;
+        }
+        
+        .teacher-desk {
+            grid-column: 4;
+            background: var(--accent);
+            color: white;
+            border-radius: 8px;
+            height: 80px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 10px;
+        }
+        
+        /* Painel de Informações do Aluno */
+        .student-info-panel {
+            position: absolute;
+            right: -350px;
+            top: 0;
+            width: 350px;
+            height: 100%;
+            background: white;
+            box-shadow: -5px 0 15px rgba(0, 0, 0, 0.1);
+            padding: 1.5rem;
+            overflow-y: auto;
+            transition: all 0.3s ease;
+            z-index: 100;
+        }
+        
+        .student-info-panel.active {
+            right: 0;
+        }
+        
+        .student-info-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 1.5rem;
+        }
+        
+        .student-info-avatar {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            background: var(--gradient);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 1.5rem;
+            margin-right: 1rem;
+        }
+        
+        .student-info-content h3 {
+            margin-bottom: 0.5rem;
+        }
+        
+        .student-info-content p {
+            color: var(--gray);
+            margin-bottom: 0.5rem;
+        }
+        
+        .close-panel {
+            position: absolute;
+            top: 1rem;
+            right: 1rem;
+            background: none;
+            border: none;
+            font-size: 1.2rem;
+            cursor: pointer;
+            color: var(--gray);
+        }
+        
+        .info-section {
+            margin-bottom: 1.5rem;
+        }
+        
+        .info-section h4 {
+            margin-bottom: 0.8rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 1px solid var(--gray-light);
+        }
+        
+        .info-item {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 0.5rem;
+        }
+        
+        .info-item span:first-child {
+            font-weight: 500;
+        }
+        
+        .info-item span:last-child {
+            color: var(--gray);
+        }
+        
+        /* Sistema DOTS */
+        .dots-container {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1.5rem;
+        }
+        
+        .dots-profile {
+            background: white;
+            border-radius: 12px;
+            padding: 1.5rem;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+        }
+        
+        .dots-profile-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 1.5rem;
+        }
+        
+        .dots-avatar {
+            width: 70px;
+            height: 70px;
+            border-radius: 50%;
+            background: var(--gradient);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 1.8rem;
+            margin-right: 1rem;
+        }
+        
+        .dots-stats {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+        }
+        
+        .dots-stat {
+            text-align: center;
+            padding: 1rem;
+            border-radius: 8px;
+            background: var(--gray-light);
+        }
+        
+        .dots-stat-value {
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin-bottom: 0.3rem;
+        }
+        
+        .dots-stat-label {
+            font-size: 0.8rem;
+            color: var(--gray);
+        }
+        
+        .dots-skills {
+            margin-bottom: 1.5rem;
+        }
+        
+        .skill-item {
+            margin-bottom: 0.8rem;
+        }
+        
+        .skill-header {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 0.3rem;
+        }
+        
+        .skill-bar {
+            height: 8px;
+            background: var(--gray-light);
+            border-radius: 4px;
+            overflow: hidden;
+        }
+        
+        .skill-progress {
+            height: 100%;
+            background: var(--primary);
+            border-radius: 4px;
+        }
+        
+        .chart-container {
+            position: relative;
+            height: 300px;
+        }
+        
+        /* Responsividade */
+        @media (max-width: 1200px) {
+            .dots-container {
+                grid-template-columns: 1fr;
+            }
+        }
+        
+        @media (max-width: 992px) {
+            .sidebar {
+                width: 70px;
+                overflow: visible;
+            }
+            
+            .sidebar-header h1, .menu-title, .menu-item span {
+                display: none;
+            }
+            
+            .menu-item {
+                justify-content: center;
+                padding: 1rem;
+            }
+            
+            .menu-item i {
+                margin-right: 0;
+                font-size: 1.2rem;
+            }
+            
+            .main-content {
+                margin-left: 70px;
+            }
+            
+            .search-bar {
+                width: 200px;
+            }
+            
+            .classroom-layout {
+                grid-template-columns: repeat(5, 1fr);
+                grid-template-rows: repeat(8, 1fr);
+            }
+        }
+        
+        @media (max-width: 768px) {
+            .sidebar {
+                transform: translateX(-100%);
+            }
+            
+            .sidebar.open {
+                transform: translateX(0);
+            }
+            
+            .main-content {
+                margin-left: 0;
+            }
+            
+            .header {
+                padding: 0 1rem;
+            }
+            
+            .search-bar {
+                display: none;
+            }
+            
+            .menu-toggle {
+                display: block;
+                margin-right: 1rem;
+                cursor: pointer;
+            }
+            
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .classroom-layout {
+                grid-template-columns: repeat(3, 1fr);
+                grid-template-rows: repeat(12, 1fr);
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="dashboard-container">
+        <!-- Sidebar de Navegação -->
+        <aside class="sidebar" id="sidebar">
+            <div class="sidebar-header">
+                <i class="fas fa-graduation-cap"></i>
+                <h1>S.U.M</h1>
+            </div>
+            
+            <nav class="sidebar-menu">
+                <div class="menu-section">
+                    <div class="menu-title">Principal</div>
+                    <a href="#" class="menu-item active">
+                        <i class="fas fa-home"></i>
+                        <span>Dashboard</span>
+                    </a>
+                    <a href="#" class="menu-item">
+                        <i class="fas fa-user"></i>
+                        <span>Meu Perfil</span>
+                    </a>
+                    <a href="#" class="menu-item">
+                        <i class="fas fa-bell"></i>
+                        <span>Notificações</span>
+                    </a>
+                </div>
+                
+                <div class="menu-section">
+                    <div class="menu-title">Conteúdo</div>
+                    <a href="#" class="menu-item">
+                        <i class="fas fa-chalkboard"></i>
+                        <span>Aulas</span>
+                    </a>
+                    <a href="#" class="menu-item">
+                        <i class="fas fa-tasks"></i>
+                        <span>Atividades</span>
+                    </a>
+                    <a href="#" class="menu-item">
+                        <i class="fas fa-file-alt"></i>
+                        <span>Avaliações</span>
+                    </a>
+                    <a href="#" class="menu-item">
+                        <i class="fas fa-book"></i>
+                        <span>Material</span>
+                    </a>
+                </div>
+                
+                <div class="menu-section">
+                    <div class="menu-title">Ferramentas</div>
+                    <a href="#" class="menu-item">
+                        <i class="fas fa-map-marked-alt"></i>
+                        <span>Mapeamento</span>
+                    </a>
+                    <a href="#" class="menu-item">
+                        <i class="fas fa-chart-line"></i>
+                        <span>Sistema DOTS</span>
+                    </a>
+                    <a href="#" class="menu-item">
+                        <i class="fas fa-comments"></i>
+                        <span>Comunicação</span>
+                    </a>
+                </div>
+                
+                <div class="menu-section">
+                    <div class="menu-title">Configurações</div>
+                    <a href="#" class="menu-item">
+                        <i class="fas fa-cog"></i>
+                        <span>Configurações</span>
+                    </a>
+                    <a href="#" class="menu-item">
+                        <i class="fas fa-question-circle"></i>
+                        <span>Ajuda & Suporte</span>
+                    </a>
+                    <a href="#" class="menu-item">
+                        <i class="fas fa-sign-out-alt"></i>
+                        <span>Sair</span>
+                    </a>
+                </div>
+            </nav>
+        </aside>
+        
+        <!-- Conteúdo Principal -->
+        <div class="main-content">
+            <!-- Header -->
+            <header class="header">
+                <div class="menu-toggle" id="menuToggle">
+                    <i class="fas fa-bars"></i>
+                </div>
+                
+                <div class="search-bar">
+                    <i class="fas fa-search"></i>
+                    <input type="text" placeholder="Pesquisar...">
+                </div>
+                
+                <div class="header-actions">
+                    <div class="notification-btn">
+                        <i class="fas fa-bell"></i>
+                        <span class="badge">3</span>
+                    </div>
+                    
+                    <div class="messages-btn">
+                        <i class="fas fa-envelope"></i>
+                        <span class="badge">5</span>
+                    </div>
+                    
+                    <div class="user-profile">
+                        <div class="user-avatar">A</div>
+                        <div class="user-info">
+                            <div class="user-name">Ana Silva</div>
+                            <div class="user-role">Aluna</div>
+                        </div>
+                    </div>
+                </div>
+            </header>
+            
+            <!-- Conteúdo do Dashboard -->
+            <div class="dashboard-content">
+                <div class="page-title">
+                    <h2>Dashboard do Aluno</h2>
+                    <div class="breadcrumb">
+                        <a href="#">Home</a> / <span>Dashboard</span>
+                    </div>
+                </div>
+                
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div class="stat-icon" style="background: rgba(67, 97, 238, 0.1); color: var(--primary);">
+                            <i class="fas fa-book"></i>
+                        </div>
+                        <div class="stat-content">
+                            <div class="stat-value">8.7</div>
+                            <div class="stat-label">Média Geral</div>
+                        </div>
+                    </div>
+                    
+                    <div class="stat-card">
+                        <div class="stat-icon" style="background: rgba(245, 37, 133, 0.1); color: var(--secondary);">
+                            <i class="fas fa-tasks"></i>
+                        </div>
+                        <div class="stat-content">
+                            <div class="stat-value">12</div>
+                            <div class="stat-label">Atividades Pendentes</div>
+                        </div>
+                    </div>
+                    
+                    <div class="stat-card">
+                        <div class="stat-icon" style="background: rgba(76, 201, 240, 0.1); color: var(--accent);">
+                            <i class="fas fa-check-circle"></i>
+                        </div>
+                        <div class="stat-content">
+                            <div class="stat-value">87%</div>
+                            <div class="stat-label">Frequência</div>
+                        </div>
+                    </div>
+                    
+                    <div class="stat-card">
+                        <div class="stat-icon" style="background: rgba(75, 181, 67, 0.1); color: var(--success);">
+                            <i class="fas fa-trophy"></i>
+                        </div>
+                        <div class="stat-content">
+                            <div class="stat-value">15</div>
+                            <div class="stat-label">Conquistas</div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Mapeamento da Sala de Aula -->
+                <div class="classroom-mapping">
+                    <div class="card-header">
+                        <h3 class="card-title">Mapeamento da Sala de Aula</h3>
+                        <div class="mapping-controls">
+                            <button class="active">Visualização</button>
+                        </div>
+                    </div>
+                    
+                    <div class="classroom-layout" id="classroomLayout">
+                        <!-- Conteúdo gerado via JavaScript -->
+                    </div>
+                    
+                    <!-- Painel de Informações do Aluno -->
+                    <div class="student-info-panel" id="studentInfoPanel">
+                        <button class="close-panel" id="closePanel">
+                            <i class="fas fa-times"></i>
+                        </button>
+                        
+                        <div class="student-info-header">
+                            <div class="student-info-avatar" id="infoAvatar">A</div>
+                            <div class="student-info-content">
+                                <h3 id="infoName">Ana Silva</h3>
+                                <p id="infoClass">9º Ano A</p>
+                                <p id="infoStatus">Status: Online</p>
+                            </div>
+                        </div>
+                        
+                        <div class="info-section">
+                            <h4>Informações Acadêmicas</h4>
+                            <div class="info-item">
+                                <span>Média Geral:</span>
+                                <span id="infoAverage">8.7</span>
+                            </div>
+                            <div class="info-item">
+                                <span>Frequência:</span>
+                                <span id="infoAttendance">87%</span>
+                            </div>
+                            <div class="info-item">
+                                <span>Posição na Classe:</span>
+                                <span id="infoRank">5ª de 32</span>
+                            </div>
+                        </div>
+                        
+                        <div class="info-section">
+                            <h4>Habilidades</h4>
+                            <div class="info-item">
+                                <span>Matemática:</span>
+                                <span id="infoMath">Avançado</span>
+                            </div>
+                            <div class="info-item">
+                                <span>Português:</span>
+                                <span id="infoPortuguese">Intermediário</span>
+                            </div>
+                            <div class="info-item">
+                                <span>Ciências:</span>
+                                <span id="infoScience">Avançado</span>
+                            </div>
+                        </div>
+                        
+                        <div class="info-section">
+                            <h4>Contato</h4>
+                            <div class="info-item">
+                                <span>E-mail:</span>
+                                <span id="infoEmail">ana.silva@escola.com</span>
+                            </div>
+                            <div class="info-item">
+                                <span>Telefone:</span>
+                                <span id="infoPhone">(11) 98765-4321</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Sistema DOTS -->
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="card-title">Sistema DOTS - Desenvolvimento Técnico e Social</h3>
+                    </div>
+                    
+                    <div class="dots-container">
+                        <div class="dots-profile">
+                            <div class="dots-profile-header">
+                                <div class="dots-avatar">A</div>
+                                <div>
+                                    <h3>Ana Silva</h3>
+                                    <p>9º Ano A - Turno Matutino</p>
+                                    <p>ID: STU2023001</p>
+                                </div>
+                            </div>
+                            
+                            <div class="dots-stats">
+                                <div class="dots-stat">
+                                    <div class="dots-stat-value">8.7</div>
+                                    <div class="dots-stat-label">Média Geral</div>
+                                </div>
+                                <div class="dots-stat">
+                                    <div class="dots-stat-value">87%</div>
+                                    <div class="dots-stat-label">Frequência</div>
+                                </div>
+                                <div class="dots-stat">
+                                    <div class="dots-stat-value">15</div>
+                                    <div class="dots-stat-label">Conquistas</div>
+                                </div>
+                                <div class="dots-stat">
+                                    <div class="dots-stat-value">5º</div>
+                                    <div class="dots-stat-label">Posição</div>
+                                </div>
+                            </div>
+                            
+                            <div class="dots-skills">
+                                <h4>Habilidades</h4>
+                                <div class="skill-item">
+                                    <div class="skill-header">
+                                        <span>Matemática</span>
+                                        <span>85%</span>
+                                    </div>
+                                    <div class="skill-bar">
+                                        <div class="skill-progress" style="width: 85%;"></div>
+                                    </div>
+                                </div>
+                                <div class="skill-item">
+                                    <div class="skill-header">
+                                        <span>Português</span>
+                                        <span>78%</span>
+                                    </div>
+                                    <div class="skill-bar">
+                                        <div class="skill-progress" style="width: 78%;"></div>
+                                    </div>
+                                </div>
+                                <div class="skill-item">
+                                    <div class="skill-header">
+                                        <span>Ciências</span>
+                                        <span>92%</span>
+                                    </div>
+                                    <div class="skill-bar">
+                                        <div class="skill-progress" style="width: 92%;"></div>
+                                    </div>
+                                </div>
+                                <div class="skill-item">
+                                    <div class="skill-header">
+                                        <span>História</span>
+                                        <span>80%</span>
+                                    </div>
+                                    <div class="skill-bar">
+                                        <div class="skill-progress" style="width: 80%;"></div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="card">
+                            <div class="card-header">
+                                <h3 class="card-title">Desempenho Acadêmico</h3>
+                            </div>
+                            <div class="chart-container">
+                                <canvas id="performanceChart"></canvas>
+                            </div>
+                        </div>
+                        
+                        <div class="card">
+                            <div class="card-header">
+                                <h3 class="card-title">Distribuição de Notas</h3>
+                            </div>
+                            <div class="chart-container">
+                                <canvas id="gradesChart"></canvas>
+                            </div>
+                        </div>
+                        
+                        <div class="card">
+                            <div class="card-header">
+                                <h3 class="card-title">Desempenho por Matéria</h3>
+                            </div>
+                            <div class="chart-container">
+                                <canvas id="subjectsChart"></canvas>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Dados dos alunos para o mapeamento
+        const students = [
+            { id: 1, name: "Ana Silva", avatar: "A", average: 8.7, attendance: "87%", rank: "5/32", math: "Avançado", portuguese: "Intermediário", science: "Avançado", email: "ana.silva@escola.com", phone: "(11) 98765-4321", status: "Online" },
+            { id: 2, name: "Bruno Oliveira", avatar: "B", average: 7.8, attendance: "92%", rank: "8/32", math: "Intermediário", portuguese: "Avançado", science: "Intermediário", email: "bruno.oliveira@escola.com", phone: "(11) 98765-4322", status: "Online" },
+            { id: 3, name: "Carla Santos", avatar: "C", average: 9.2, attendance: "95%", rank: "2/32", math: "Avançado", portuguese: "Avançado", science: "Avançado", email: "carla.santos@escola.com", phone: "(11) 98765-4323", status: "Ausente" },
+            { id: 4, name: "Daniel Costa", avatar: "D", average: 6.5, attendance: "78%", rank: "15/32", math: "Básico", portuguese: "Intermediário", science: "Básico", email: "daniel.costa@escola.com", phone: "(11) 98765-4324", status: "Online" },
+            { id: 5, name: "Eduarda Pereira", avatar: "E", average: 8.9, attendance: "90%", rank: "4/32", math: "Avançado", portuguese: "Avançado", science: "Intermediário", email: "eduarda.pereira@escola.com", phone: "(11) 98765-4325", status: "Offline" },
+            { id: 6, name: "Felipe Rodrigues", avatar: "F", average: 7.2, attendance: "85%", rank: "12/32", math: "Intermediário", portuguese: "Intermediário", science: "Intermediário", email: "felipe.rodrigues@escola.com", phone: "(11) 98765-4326", status: "Online" },
+            { id: 7, name: "Gabriela Almeida", avatar: "G", average: 9.5, attendance: "98%", rank: "1/32", math: "Avançado", portuguese: "Avançado", science: "Avançado", email: "gabriela.almeida@escola.com", phone: "(11) 98765-4327", status: "Online" },
+            { id: 8, name: "Henrique Lima", avatar: "H", average: 8.0, attendance: "88%", rank: "7/32", math: "Intermediário", portuguese: "Avançado", science: "Intermediário", email: "henrique.lima@escola.com", phone: "(11) 98765-4328", status: "Offline" },
+            { id: 9, name: "Isabela Souza", avatar: "I", average: 7.5, attendance: "82%", rank: "10/32", math: "Intermediário", portuguese: "Intermediário", science: "Intermediário", email: "isabela.souza@escola.com", phone: "(11) 98765-4329", status: "Online" },
+            { id: 10, name: "João Mendes", avatar: "J", average: 6.8, attendance: "75%", rank: "18/32", math: "Básico", portuguese: "Intermediário", science: "Básico", email: "joao.mendes@escola.com", phone: "(11) 98765-4330", status: "Ausente" }
+        ];
+
+        // Gerar o layout da sala de aula
+        function generateClassroom() {
+            const classroomLayout = document.getElementById('classroomLayout');
+            classroomLayout.innerHTML = '';
+            
+            // Mesa do professor
+            const teacherDesk = document.createElement('div');
+            teacherDesk.className = 'teacher-desk';
+            teacherDesk.innerHTML = '<div class="seat-content"><i class="fas fa-chalkboard-teacher"></i><div class="seat-name">Professora</div></div>';
+            classroomLayout.appendChild(teacherDesk);
+            
+            // Gerar carteiras (6 linhas x 7 colunas = 42 carteiras)
+            for (let i = 0; i < 42; i++) {
+                const seat = document.createElement('div');
+                seat.className = 'seat empty';
+                seat.setAttribute('data-id', i);
+                
+                const seatContent = document.createElement('div');
+                seatContent.className = 'seat-content';
+                
+                // Adicionar aluno se existir no índice
+                if (i < students.length) {
+                    seat.className = 'seat occupied';
+                    seat.setAttribute('data-student-id', students[i].id);
+                    
+                    seatContent.innerHTML = `
+                        <div class="seat-avatar">${students[i].avatar}</div>
+                        <div class="seat-name">${students[i].name.split(' ')[0]}</div>
+                    `;
+                    
+                    // Adicionar evento de mouseover para mostrar informações
+                    seat.addEventListener('mouseenter', () => showStudentInfo(students[i]));
+                } else {
+                    seatContent.innerHTML = '<i class="fas fa-chair"></i>';
+                }
+                
+                seat.appendChild(seatContent);
+                classroomLayout.appendChild(seat);
+            }
+        }
+
+        // Mostrar informações do aluno
+        function showStudentInfo(student) {
+            const panel = document.getElementById('studentInfoPanel');
+            const infoAvatar = document.getElementById('infoAvatar');
+            const infoName = document.getElementById('infoName');
+            const infoClass = document.getElementById('infoClass');
+            const infoStatus = document.getElementById('infoStatus');
+            const infoAverage = document.getElementById('infoAverage');
+            const infoAttendance = document.getElementById('infoAttendance');
+            const infoRank = document.getElementById('infoRank');
+            const infoMath = document.getElementById('infoMath');
+            const infoPortuguese = document.getElementById('infoPortuguese');
+            const infoScience = document.getElementById('infoScience');
+            const infoEmail = document.getElementById('infoEmail');
+            const infoPhone = document.getElementById('infoPhone');
+            
+            infoAvatar.textContent = student.avatar;
+            infoName.textContent = student.name;
+            infoClass.textContent = '9º Ano A';
+            infoStatus.textContent = `Status: ${student.status}`;
+            infoAverage.textContent = student.average;
+            infoAttendance.textContent = student.attendance;
+            infoRank.textContent = `${student.rank} posição`;
+            infoMath.textContent = student.math;
+            infoPortuguese.textContent = student.portuguese;
+            infoScience.textContent = student.science;
+            infoEmail.textContent = student.email;
+            infoPhone.textContent = student.phone;
+            
+            panel.classList.add('active');
+        }
+
+        // Fechar painel de informações
+        document.getElementById('closePanel').addEventListener('click', () => {
+            document.getElementById('studentInfoPanel').classList.remove('active');
+        });
+
+        // Gráficos de desempenho
+        function initCharts() {
+            // Gráfico de desempenho acadêmico
+            const performanceCtx = document.getElementById('performanceChart').getContext('2d');
+            const performanceChart = new Chart(performanceCtx, {
+                type: 'line',
+                data: {
+                    labels: ['Jan', 'Fev', 'Mar', 'Abr', 'Mai', 'Jun', 'Jul', 'Ago', 'Set', 'Out', 'Nov', 'Dez'],
+                    datasets: [{
+                        label: 'Desempenho Mensal',
+                        data: [7.5, 7.8, 8.2, 8.5, 8.3, 8.7, 8.9, 8.7, 8.8, 8.9, 9.0, 8.7],
+                        borderColor: '#4361ee',
+                        backgroundColor: 'rgba(67, 97, 238, 0.1)',
+                        tension: 0.3,
+                        fill: true
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        y: {
+                            beginAtZero: false,
+                            min: 6,
+                            max: 10
+                        }
+                    }
+                }
+            });
+
+            // Gráfico de distribuição de notas
+            const gradesCtx = document.getElementById('gradesChart').getContext('2d');
+            const gradesChart = new Chart(gradesCtx, {
+                type: 'doughnut',
+                data: {
+                    labels: ['Excelente (9-10)', 'Bom (7-8.9)', 'Regular (5-6.9)', 'Insuficiente (<5)'],
+                    datasets: [{
+                        data: [15, 45, 30, 10],
+                        backgroundColor: [
+                            '#4bb543',
+                            '#4361ee',
+                            '#ffcc00',
+                            '#dc3545'
+                        ]
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'bottom'
+                        }
+                    }
+                }
+            });
+
+            // Gráfico de desempenho por matéria
+            const subjectsCtx = document.getElementById('subjectsChart').getContext('2d');
+            const subjectsChart = new Chart(subjectsCtx, {
+                type: 'radar',
+                data: {
+                    labels: ['Matemática', 'Português', 'Ciências', 'História', 'Geografia', 'Inglês'],
+                    datasets: [{
+                        label: 'Desempenho por Matéria',
+                        data: [85, 78, 92, 80, 75, 88],
+                        backgroundColor: 'rgba(67, 97, 238, 0.2)',
+                        borderColor: '#4361ee',
+                        pointBackgroundColor: '#4361ee'
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        r: {
+                            beginAtZero: true,
+                            max: 100,
+                            ticks: {
+                                stepSize: 20
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        // Inicializar a página
+        document.addEventListener('DOMContentLoaded', () => {
+            generateClassroom();
+            initCharts();
+            
+            // Menu toggle para mobile
+            document.getElementById('menuToggle').addEventListener('click', () => {
+                document.getElementById('sidebar').classList.toggle('open');
+            });
+        });
+    </script>
+</body>
+</html>
