@@ -1,0 +1,600 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>S.U.M - Mapeamento Inteligente</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary: #4361ee;
+            --secondary: #3a0ca3;
+            --success: #4cc9f0;
+            --info: #7209b7;
+            --warning: #f72585;
+            --light: #f8f9fa;
+            --dark: #212529;
+            --background: #f0f2f5;
+            --card-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background-color: var(--background);
+            color: var(--dark);
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        
+        header {
+            text-align: center;
+            margin-bottom: 30px;
+            padding: 20px;
+            background: white;
+            border-radius: 12px;
+            box-shadow: var(--card-shadow);
+        }
+        
+        header h1 {
+            color: var(--secondary);
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 15px;
+        }
+        
+        header p {
+            color: #6c757d;
+            max-width: 800px;
+            margin: 0 auto;
+            line-height: 1.6;
+        }
+        
+        .dashboard {
+            display: grid;
+            grid-template-columns: 300px 1fr;
+            gap: 20px;
+        }
+        
+        .sidebar {
+            background: white;
+            border-radius: 12px;
+            padding: 20px;
+            box-shadow: var(--card-shadow);
+            height: fit-content;
+        }
+        
+        .filters {
+            margin-bottom: 25px;
+        }
+        
+        .filters h3 {
+            margin-bottom: 15px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid #eee;
+            color: var(--secondary);
+        }
+        
+        .filter-group {
+            margin-bottom: 15px;
+        }
+        
+        .filter-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: 500;
+        }
+        
+        .filter-group select, .filter-group input {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            font-size: 14px;
+        }
+        
+        .students-list {
+            max-height: 500px;
+            overflow-y: auto;
+        }
+        
+        .student-item {
+            padding: 12px;
+            border: 1px solid #eee;
+            border-radius: 8px;
+            margin-bottom: 10px;
+            cursor: move;
+            background: white;
+            transition: all 0.2s;
+        }
+        
+        .student-item:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        }
+        
+        .student-name {
+            font-weight: 600;
+            margin-bottom: 5px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .vision-indicator {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            display: inline-block;
+            margin-right: 5px;
+        }
+        
+        .vision-good { background: #28a745; }
+        .vision-medium { background: #ffc107; }
+        .vision-poor { background: #dc3545; }
+        
+        .student-info {
+            font-size: 0.85rem;
+            color: #6c757d;
+        }
+        
+        .classroom-container {
+            background: white;
+            border-radius: 12px;
+            padding: 20px;
+            box-shadow: var(--card-shadow);
+        }
+        
+        .classroom-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid #eee;
+        }
+        
+        .classroom-header h2 {
+            color: var(--secondary);
+        }
+        
+        .mapping-options {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+        
+        .mapping-btn {
+            padding: 10px 15px;
+            background: #f0f2f5;
+            border: none;
+            border-radius: 6px;
+            font-size: 0.9rem;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .mapping-btn.active {
+            background: var(--primary);
+            color: white;
+        }
+        
+        .classroom-layout {
+            background: #f8f9fa;
+            border-radius: 8px;
+            padding: 20px;
+            min-height: 500px;
+            position: relative;
+        }
+        
+        .classroom-grid {
+            display: grid;
+            grid-template-columns: repeat(6, 1fr);
+            gap: 15px;
+        }
+        
+        .desk {
+            background: white;
+            border: 2px dashed #dee2e6;
+            border-radius: 8px;
+            padding: 15px;
+            text-align: center;
+            min-height: 120px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            transition: all 0.3s;
+        }
+        
+        .desk.empty {
+            background: #f8f9fa;
+            border: 2px dashed #adb5bd;
+        }
+        
+        .desk.hover {
+            background: rgba(67, 97, 238, 0.1);
+            border: 2px dashed var(--primary);
+        }
+        
+        .desk .student-name {
+            font-weight: 600;
+            margin-bottom: 5px;
+        }
+        
+        .desk .student-info {
+            font-size: 0.75rem;
+            color: #6c757d;
+        }
+        
+        .desk .vision-indicator {
+            position: absolute;
+            top: 8px;
+            right: 8px;
+        }
+        
+        .teacher-desk {
+            grid-column: 3 / 5;
+            background: linear-gradient(135deg, #e9ecef 0%, #dee2e6 100%);
+            border: 2px solid #ced4da;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-weight: 600;
+            color: var(--dark);
+        }
+        
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 15px;
+            margin-top: 20px;
+        }
+        
+        .stat-card {
+            background: white;
+            border-radius: 8px;
+            padding: 15px;
+            box-shadow: var(--card-shadow);
+            text-align: center;
+        }
+        
+        .stat-card h3 {
+            font-size: 1.2rem;
+            margin-bottom: 5px;
+            color: var(--secondary);
+        }
+        
+        .stat-card p {
+            color: #6c757d;
+            font-size: 0.9rem;
+        }
+        
+        @media (max-width: 992px) {
+            .dashboard {
+                grid-template-columns: 1fr;
+            }
+            
+            .classroom-grid {
+                grid-template-columns: repeat(4, 1fr);
+            }
+        }
+        
+        @media (max-width: 768px) {
+            .classroom-grid {
+                grid-template-columns: repeat(3, 1fr);
+            }
+            
+            .mapping-options {
+                flex-wrap: wrap;
+            }
+            
+            .stats {
+                grid-template-columns: 1fr;
+            }
+        }
+        
+        @media (max-width: 576px) {
+            .classroom-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1><i class="fas fa-chalkboard"></i> S.U.M - Mapeamento Inteligente</h1>
+            <p>Sistema de posicionamento estratégico de alunos com base em critérios pedagógicos, dificuldade de visão e desempenho acadêmico</p>
+        </header>
+        
+        <div class="dashboard">
+            <div class="sidebar">
+                <div class="filters">
+                    <h3><i class="fas fa-filter"></i> Filtros</h3>
+                    
+                    <div class="filter-group">
+                        <label for="class-select">Selecionar Turma:</label>
+                        <select id="class-select">
+                            <option value="8a">8º Ano A</option>
+                            <option value="8b">8º Ano B</option>
+                            <option value="9a">9º Ano A</option>
+                            <option value="9b">9º Ano B</option>
+                        </select>
+                    </div>
+                    
+                    <div class="filter-group">
+                        <label for="sort-select">Ordenar por:</label>
+                        <select id="sort-select">
+                            <option value="name">Nome</option>
+                            <option value="vision">Dificuldade de Visão</option>
+                            <option value="humanas">Desempenho em Humanas</option>
+                            <option value="exatas">Desempenho em Exatas</option>
+                            <option value="linguagens">Desempenho em Linguagens</option>
+                        </select>
+                    </div>
+                    
+                    <div class="filter-group">
+                        <label for="search-input">Buscar Aluno:</label>
+                        <input type="text" id="search-input" placeholder="Digite o nome do aluno...">
+                    </div>
+                </div>
+                
+                <h3><i class="fas fa-users"></i> Lista de Alunos</h3>
+                <div class="students-list" id="students-list">
+                    <!-- Alunos serão inseridos aqui via JavaScript -->
+                </div>
+            </div>
+            
+            <div class="classroom-container">
+                <div class="classroom-header">
+                    <h2><i class="fas fa-door-open"></i> Sala de Aula - 8º Ano A</h2>
+                    <button class="mapping-btn"><i class="fas fa-save"></i> Salvar Mapeamento</button>
+                </div>
+                
+                <div class="mapping-options">
+                    <button class="mapping-btn active"><i class="fas fa-brain"></i> Inteligente</button>
+                    <button class="mapping-btn"><i class="fas fa-user-friends"></i> Duplas</button>
+                    <button class="mapping-btn"><i class="fas fa-object-group"></i> Grupos</button>
+                    <button class="mapping-btn"><i class="fas fa-magic"></i> Otimizar</button>
+                    <button class="mapping-btn"><i class="fas fa-sync-alt"></i> Reiniciar</button>
+                </div>
+                
+                <div class="classroom-layout">
+                    <div class="classroom-grid" id="classroom-grid">
+                        <!-- Mesas serão inseridas aqui via JavaScript -->
+                    </div>
+                </div>
+                
+                <div class="stats">
+                    <div class="stat-card">
+                        <h3>72%</h3>
+                        <p>Otimização de Aprendizado</p>
+                    </div>
+                    <div class="stat-card">
+                        <h3>5</h3>
+                        <p>Alunos com Dificuldade Visual</p>
+                    </div>
+                    <div class="stat-card">
+                        <h3>8.2</h3>
+                        <p>Média de Desempenho da Sala</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Dados de exemplo dos alunos
+        const students = [
+            { id: 1, name: "Ana Silva", vision: "good", humanas: 8.5, exatas: 7.0, linguagens: 9.0 },
+            { id: 2, name: "Bruno Costa", vision: "medium", humanas: 6.0, exatas: 9.2, linguagens: 7.5 },
+            { id: 3, name: "Carla Mendes", vision: "poor", humanas: 7.8, exatas: 6.5, linguagens: 8.2 },
+            { id: 4, name: "Daniel Alves", vision: "good", humanas: 9.0, exatas: 8.7, linguagens: 8.9 },
+            { id: 5, name: "Eduarda Lima", vision: "medium", humanas: 5.5, exatas: 8.0, linguagens: 6.8 },
+            { id: 6, name: "Felipe Souza", vision: "good", humanas: 8.2, exatas: 7.5, linguagens: 8.5 },
+            { id: 7, name: "Gabriela Santos", vision: "poor", humanas: 7.0, exatas: 6.8, linguagens: 7.2 },
+            { id: 8, name: "Henrique Oliveira", vision: "good", humanas: 8.8, exatas: 9.0, linguagens: 8.7 },
+            { id: 9, name: "Isabela Ferreira", vision: "medium", humanas: 6.5, exatas: 7.2, linguagens: 7.8 },
+            { id: 10, name: "João Rodrigues", vision: "good", humanas: 9.2, exatas: 8.5, linguagens: 9.0 },
+            { id: 11, name: "Larissa Martins", vision: "poor", humanas: 7.5, exatas: 6.0, linguagens: 7.0 },
+            { id: 12, name: "Marcos Barbosa", vision: "good", humanas: 8.0, exatas: 8.8, linguagens: 8.3 }
+        ];
+
+        // Posicionamento inicial dos alunos na sala de aula
+        let classroomLayout = [
+            { desk: 1, student: 1 },
+            { desk: 2, student: 2 },
+            { desk: 3, student: 3 },
+            { desk: 4, student: 4 },
+            { desk: 5, student: 5 },
+            { desk: 6, student: 6 },
+            { desk: 7, student: 7 },
+            { desk: 8, student: 8 },
+            { desk: 9, student: 9 },
+            { desk: 10, student: 10 },
+            { desk: 11, student: 11 },
+            { desk: 12, student: 12 },
+            { desk: 13, student: null },
+            { desk: 14, student: null },
+            { desk: 15, student: null },
+            { desk: 16, student: null },
+            { desk: 17, student: null },
+            { desk: 18, student: null }
+        ];
+
+        // Função para renderizar a lista de alunos
+        function renderStudentsList() {
+            const studentsList = document.getElementById('students-list');
+            studentsList.innerHTML = '';
+            
+            students.forEach(student => {
+                const studentEl = document.createElement('div');
+                studentEl.className = 'student-item';
+                studentEl.draggable = true;
+                studentEl.id = `student-${student.id}`;
+                studentEl.dataset.id = student.id;
+                
+                const visionClass = `vision-${student.vision}`;
+                const visionText = student.vision === 'good' ? 'Boa' : (student.vision === 'medium' ? 'Média' : 'Baixa');
+                
+                studentEl.innerHTML = `
+                    <div class="student-name">
+                        ${student.name}
+                        <span class="vision-indicator ${visionClass}" title="Visão: ${visionText}"></span>
+                    </div>
+                    <div class="student-info">
+                        H: ${student.humanas} | E: ${student.exatas} | L: ${student.linguagens}
+                    </div>
+                `;
+                
+                studentsList.appendChild(studentEl);
+            });
+            
+            // Adicionar event listeners para drag and drop
+            document.querySelectorAll('.student-item').forEach(item => {
+                item.addEventListener('dragstart', handleDragStart);
+            });
+        }
+
+        // Função para renderizar a sala de aula
+        function renderClassroom() {
+            const classroomGrid = document.getElementById('classroom-grid');
+            classroomGrid.innerHTML = '';
+            
+            // Adicionar a mesa do professor
+            const teacherDesk = document.createElement('div');
+            teacherDesk.className = 'desk teacher-desk';
+            teacherDesk.innerHTML = '<i class="fas fa-chalkboard-teacher"></i> Professor';
+            classroomGrid.appendChild(teacherDesk);
+            
+            // Adicionar as mesas dos alunos
+            for (let i = 1; i <= 18; i++) {
+                const desk = document.createElement('div');
+                desk.className = 'desk empty';
+                desk.id = `desk-${i}`;
+                desk.dataset.desk = i;
+                
+                // Verificar se há um aluno nesta mesa
+                const deskAssignment = classroomLayout.find(a => a.desk === i);
+                if (deskAssignment && deskAssignment.student) {
+                    const student = students.find(s => s.id === deskAssignment.student);
+                    const visionClass = `vision-${student.vision}`;
+                    const visionText = student.vision === 'good' ? 'Boa' : (student.vision === 'medium' ? 'Média' : 'Baixa');
+                    
+                    desk.className = 'desk';
+                    desk.innerHTML = `
+                        <span class="vision-indicator ${visionClass}" title="Visão: ${visionText}"></span>
+                        <div class="student-name">${student.name}</div>
+                        <div class="student-info">H:${student.humanas} E:${student.exatas} L:${student.linguagens}</div>
+                    `;
+                } else {
+                    desk.textContent = 'Mesa Vazia';
+                }
+                
+                // Adicionar event listeners para drag and drop
+                desk.addEventListener('dragover', handleDragOver);
+                desk.addEventListener('drop', handleDrop);
+                desk.addEventListener('dragenter', handleDragEnter);
+                desk.addEventListener('dragleave', handleDragLeave);
+                
+                classroomGrid.appendChild(desk);
+            }
+        }
+
+        // Variáveis para controlar o drag and drop
+        let draggedStudentId = null;
+
+        function handleDragStart(e) {
+            draggedStudentId = parseInt(e.target.closest('.student-item').dataset.id);
+            e.dataTransfer.setData('text/plain', draggedStudentId);
+            e.target.classList.add('dragging');
+        }
+
+        function handleDragOver(e) {
+            e.preventDefault();
+        }
+
+        function handleDrop(e) {
+            e.preventDefault();
+            const deskId = parseInt(e.target.closest('.desk').dataset.desk);
+            
+            // Atualizar o layout da sala de aula
+            const existingAssignmentIndex = classroomLayout.findIndex(a => a.student === draggedStudentId);
+            if (existingAssignmentIndex !== -1) {
+                classroomLayout[existingAssignmentIndex].student = null;
+            }
+            
+            const deskAssignmentIndex = classroomLayout.findIndex(a => a.desk === deskId);
+            if (deskAssignmentIndex !== -1) {
+                classroomLayout[deskAssignmentIndex].student = draggedStudentId;
+            }
+            
+            // Renderizar novamente a sala de aula
+            renderClassroom();
+            
+            // Limpar o estado de arrasto
+            draggedStudentId = null;
+            e.target.classList.remove('hover');
+        }
+
+        function handleDragEnter(e) {
+            e.preventDefault();
+            e.target.classList.add('hover');
+        }
+
+        function handleDragLeave(e) {
+            e.preventDefault();
+            e.target.classList.remove('hover');
+        }
+
+        // Inicializar a interface
+        document.addEventListener('DOMContentLoaded', () => {
+            renderStudentsList();
+            renderClassroom();
+            
+            // Adicionar event listeners para os botões de mapeamento
+            document.querySelectorAll('.mapping-btn').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    if (this.textContent.includes('Inteligente')) {
+                        alert('Mapeamento inteligente aplicado! Alunos organizados por complementaridade de habilidades.');
+                    } else if (this.textContent.includes('Duplas')) {
+                        alert('Modo duplas ativado! Arraste alunos para formar pares.');
+                    } else if (this.textContent.includes('Grupos')) {
+                        alert('Modo grupos ativado! Arraste alunos para formar grupos.');
+                    } else if (this.textContent.includes('Otimizar')) {
+                        alert('Otimização aplicada! Melhor configuração para aprendizado encontrada.');
+                    } else if (this.textContent.includes('Reiniciar')) {
+                        if (confirm('Tem certeza que deseja reiniciar o mapeamento?')) {
+                            classroomLayout = classroomLayout.map(item => ({ ...item, student: null }));
+                            renderClassroom();
+                        }
+                    } else if (this.textContent.includes('Salvar')) {
+                        alert('Mapeamento salvo com sucesso!');
+                    }
+                    
+                    // Toggle active class
+                    if (!this.classList.contains('active') && !this.textContent.includes('Salvar')) {
+                        document.querySelectorAll('.mapping-btn').forEach(b => b.classList.remove('active'));
+                        this.classList.add('active');
+                    }
+                });
+            });
+        });
+    </script>
+</body>
+</html>

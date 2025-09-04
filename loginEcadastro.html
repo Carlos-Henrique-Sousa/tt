@@ -1,0 +1,658 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Acesso - S.U.M</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary: #4361ee;
+            --primary-dark: #3a0ca3;
+            --primary-light: #4895ef;
+            --secondary: #f72585;
+            --accent: #4cc9f0;
+            --light: #f8f9fa;
+            --dark: #212529;
+            --gray: #6c757d;
+            --gray-light: #e9ecef;
+            --success: #4bb543;
+            --warning: #ffcc00;
+            --danger: #dc3545;
+            --gradient: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            --glass: rgba(255, 255, 255, 0.1);
+            --glass-border: rgba(255, 255, 255, 0.2);
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background: linear-gradient(120deg, #f5f7fa 0%, #e4e8f0 100%);
+            color: var(--dark);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            overflow-x: hidden;
+            padding: 20px;
+        }
+        
+        .auth-container {
+            display: flex;
+            width: 1000px;
+            height: 600px;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 25px 50px rgba(0, 0, 0, 0.15);
+            overflow: hidden;
+            position: relative;
+        }
+        
+        .illustration-panel {
+            flex: 1.2;
+            background: var(--gradient);
+            color: white;
+            padding: 40px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .illustration-content {
+            z-index: 2;
+            position: relative;
+        }
+        
+        .illustration-panel::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200"><circle cx="40" cy="40" r="20" fill="white" fill-opacity="0.05"/><circle cx="120" cy="160" r="30" fill="white" fill-opacity="0.05"/><circle cx="160" cy="60" r="15" fill="white" fill-opacity="0.05"/><circle cx="80" cy="120" r="25" fill="white" fill-opacity="0.05"/></svg>');
+            background-size: cover;
+        }
+        
+        .form-panel {
+            flex: 1;
+            padding: 40px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            background: white;
+            position: relative;
+            overflow-y: auto;
+        }
+        
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 30px;
+        }
+        
+        .logo h1 {
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: var(--primary);
+        }
+        
+        .logo-icon {
+            font-size: 2.2rem;
+            color: var(--primary);
+        }
+        
+        .illustration-panel .logo h1,
+        .illustration-panel .logo-icon {
+            color: white;
+        }
+        
+        .illustration-title {
+            font-size: 2rem;
+            font-weight: 700;
+            margin-bottom: 15px;
+            line-height: 1.3;
+        }
+        
+        .illustration-text {
+            font-size: 1.1rem;
+            opacity: 0.9;
+            margin-bottom: 30px;
+            line-height: 1.6;
+        }
+        
+        .features-list {
+            list-style: none;
+            margin-top: 30px;
+        }
+        
+        .features-list li {
+            display: flex;
+            align-items: center;
+            margin-bottom: 15px;
+            font-weight: 500;
+        }
+        
+        .features-list li i {
+            margin-right: 10px;
+            background: var(--glass);
+            width: 30px;
+            height: 30px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+        }
+        
+        .auth-form {
+            width: 100%;
+            max-width: 400px;
+            margin: 0 auto;
+        }
+        
+        .form-title {
+            font-size: 1.8rem;
+            margin-bottom: 10px;
+            color: var(--dark);
+            font-weight: 700;
+        }
+        
+        .form-subtitle {
+            color: var(--gray);
+            margin-bottom: 30px;
+            font-size: 1.1rem;
+        }
+        
+        .input-group {
+            margin-bottom: 20px;
+            position: relative;
+        }
+        
+        .input-group i {
+            position: absolute;
+            left: 15px;
+            top: 14px;
+            color: #999;
+            transition: all 0.3s ease;
+        }
+        
+        .input-group input {
+            width: 100%;
+            padding: 14px 15px 14px 45px;
+            border: 1px solid #ddd;
+            border-radius: 10px;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+        }
+        
+        .input-group input:focus {
+            border-color: var(--primary);
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(67, 97, 238, 0.1);
+        }
+        
+        .input-group input:focus + i {
+            color: var(--primary);
+        }
+        
+        .remember-forgot {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            font-size: 0.9rem;
+        }
+        
+        .remember {
+            display: flex;
+            align-items: center;
+        }
+        
+        .remember input {
+            margin-right: 8px;
+        }
+        
+        .forgot-link {
+            color: var(--primary);
+            text-decoration: none;
+            font-weight: 500;
+        }
+        
+        .forgot-link:hover {
+            text-decoration: underline;
+        }
+        
+        .btn {
+            width: 100%;
+            padding: 14px;
+            border-radius: 10px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: none;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        
+        .btn-primary {
+            background: var(--gradient);
+            color: white;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .btn-primary::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+            transition: all 0.6s ease;
+        }
+        
+        .btn-primary:hover::before {
+            left: 100%;
+        }
+        
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(67, 97, 238, 0.3);
+        }
+        
+        .divider {
+            display: flex;
+            align-items: center;
+            margin: 25px 0;
+            color: #999;
+        }
+        
+        .divider span {
+            flex: 1;
+            height: 1px;
+            background: #ddd;
+        }
+        
+        .divider p {
+            margin: 0 15px;
+            font-size: 0.9rem;
+        }
+        
+        .social-login {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 12px;
+            margin-bottom: 25px;
+        }
+        
+        .social-btn {
+            padding: 12px;
+            border-radius: 8px;
+            border: 1px solid #ddd;
+            background: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .social-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+        
+        .social-btn.google {
+            color: #DB4437;
+        }
+        
+        .social-btn.microsoft {
+            color: #0078D7;
+        }
+        
+        .social-btn.apple {
+            color: #000;
+        }
+        
+        .auth-switch {
+            text-align: center;
+            margin-top: 20px;
+            font-size: 0.95rem;
+        }
+        
+        .auth-switch p {
+            color: var(--gray);
+        }
+        
+        .auth-switch button {
+            background: none;
+            border: none;
+            color: var(--primary);
+            cursor: pointer;
+            font-weight: 600;
+            text-decoration: underline;
+        }
+        
+        .user-type-selector {
+            display: flex;
+            margin-bottom: 20px;
+            background: var(--gray-light);
+            border-radius: 10px;
+            padding: 5px;
+        }
+        
+        .user-type {
+            flex: 1;
+            text-align: center;
+            padding: 10px;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: 500;
+        }
+        
+        .user-type.active {
+            background: white;
+            box-shadow: 0 3px 10px rgba(0, 0, 0, 0.1);
+        }
+        
+        /* Animações */
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        .auth-form {
+            animation: fadeIn 0.5s ease;
+        }
+        
+        /* Responsividade */
+        @media (max-width: 1000px) {
+            .auth-container {
+                width: 90%;
+                height: auto;
+                flex-direction: column;
+            }
+            
+            .illustration-panel {
+                display: none;
+            }
+            
+            .form-panel {
+                padding: 30px;
+            }
+        }
+        
+        @media (max-width: 480px) {
+            .form-panel {
+                padding: 20px;
+            }
+            
+            .logo h1 {
+                font-size: 1.5rem;
+            }
+            
+            .form-title {
+                font-size: 1.5rem;
+            }
+            
+            .social-login {
+                grid-template-columns: 1fr;
+            }
+        }
+        
+        /* Elementos visuais adicionais */
+        .floating-element {
+            position: absolute;
+            width: 100px;
+            height: 100px;
+            border-radius: 50%;
+            background: var(--gradient);
+            opacity: 0.1;
+            animation: float 15s infinite ease-in-out;
+        }
+        
+        .floating-element:nth-child(1) {
+            top: -30px;
+            left: -30px;
+            width: 150px;
+            height: 150px;
+            animation-delay: 0s;
+        }
+        
+        .floating-element:nth-child(2) {
+            bottom: 50px;
+            right: -50px;
+            width: 120px;
+            height: 120px;
+            animation-delay: -5s;
+        }
+        
+        .floating-element:nth-child(3) {
+            top: 100px;
+            right: 50px;
+            width: 80px;
+            height: 80px;
+            animation-delay: -10s;
+        }
+        
+        @keyframes float {
+            0%, 100% {
+                transform: translate(0, 0) rotate(0deg);
+            }
+            25% {
+                transform: translate(-10px, 10px) rotate(5deg);
+            }
+            50% {
+                transform: translate(5px, -5px) rotate(-5deg);
+            }
+            75% {
+                transform: translate(8px, 8px) rotate(3deg);
+            }
+        }
+
+        /* Modo de cadastro */
+        #signupForm {
+            display: none;
+        }
+
+        /* Efeito de transição suave */
+        .form-transition {
+            transition: opacity 0.3s ease, transform 0.3s ease;
+        }
+    </style>
+</head>
+<body>
+    <div class="floating-element"></div>
+    <div class="floating-element"></div>
+    <div class="floating-element"></div>
+    
+    <div class="auth-container" id="authContainer">
+        <!-- Painel de Ilustração -->
+        <div class="illustration-panel">
+            <div class="illustration-content">
+                <div class="logo">
+                    <i class="fas fa-graduation-cap logo-icon"></i>
+                    <h1>S.U.M</h1>
+                </div>
+                
+                <h2 class="illustration-title">Sistema de Mapeamento Educacional Inteligente</h2>
+                <p class="illustration-text">Acesse a plataforma completa de gestão educacional com recursos avançados para alunos, professores e instituições.</p>
+                
+                <ul class="features-list">
+                    <li><i class="fas fa-check-circle"></i> Mapeamento inteligente de salas de aula</li>
+                    <li><i class="fas fa-check-circle"></i> Acompanhamento de desempenho individual</li>
+                    <li><i class="fas fa-check-circle"></i> Sistema de atividades e avaliações</li>
+                    <li><i class="fas fa-check-circle"></i> Comunicação integrada entre usuários</li>
+                    <li><i class="fas fa-check-circle"></i> Relatórios e analytics educacionais</li>
+                </ul>
+            </div>
+        </div>
+        
+        <!-- Painel de Formulário -->
+        <div class="form-panel">
+            <div class="auth-form form-transition" id="loginForm">
+                <div class="logo">
+                    <i class="fas fa-graduation-cap logo-icon"></i>
+                    <h1>S.U.M</h1>
+                </div>
+                
+                <h2 class="form-title">Bem-vindo de volta!</h2>
+                <p class="form-subtitle">Faça login para acessar sua conta</p>
+                
+                <div class="user-type-selector">
+                    <div class="user-type active" data-type="student">Aluno</div>
+                    <div class="user-type" data-type="teacher">Professor</div>
+                    <div class="user-type" data-type="school">Escola</div>
+                </div>
+                
+                <form>
+                    <div class="input-group">
+                        <i class="fas fa-user"></i>
+                        <input type="text" placeholder="Usuário ou E-mail" required>
+                    </div>
+                    
+                    <div class="input-group">
+                        <i class="fas fa-lock"></i>
+                        <input type="password" placeholder="Senha" required>
+                    </div>
+                    
+                    <div class="remember-forgot">
+                        <label class="remember">
+                            <input type="checkbox"> Lembrar-me
+                        </label>
+                        <a href="#" class="forgot-link">Esqueceu a senha?</a>
+                    </div>
+                    
+                    <button type="submit" class="btn btn-primary">
+                        <i class="fas fa-sign-in-alt" style="margin-right: 8px;"></i>
+                        Entrar
+                    </button>
+                    
+                    <div class="divider">
+                        <span></span>
+                        <p>ou</p>
+                        <span></span>
+                    </div>
+                    
+                    <div class="social-login">
+                        <button type="button" class="social-btn google">
+                            <i class="fab fa-google"></i>
+                        </button>
+                        <button type="button" class="social-btn microsoft">
+                            <i class="fab fa-microsoft"></i>
+                        </button>
+                        <button type="button" class="social-btn apple">
+                            <i class="fab fa-apple"></i>
+                        </button>
+                    </div>
+                    
+                    <div class="auth-switch">
+                        <p>Não tem uma conta? <button type="button" onclick="switchToSignup()">Cadastre-se</button></p>
+                    </div>
+                </form>
+            </div>
+            
+            <div class="auth-form form-transition" id="signupForm">
+                <div class="logo">
+                    <i class="fas fa-graduation-cap logo-icon"></i>
+                    <h1>S.U.M</h1>
+                </div>
+                
+                <h2 class="form-title">Crie sua conta</h2>
+                <p class="form-subtitle">Preencha os dados para se cadastrar</p>
+                
+                <div class="user-type-selector">
+                    <div class="user-type active" data-type="student">Aluno</div>
+                    <div class="user-type" data-type="teacher">Professor</div>
+                    <div class="user-type" data-type="school">Escola</div>
+                </div>
+                
+                <form>
+                    <div class="input-group">
+                        <i class="fas fa-user"></i>
+                        <input type="text" placeholder="Nome completo" required>
+                    </div>
+                    
+                    <div class="input-group">
+                        <i class="fas fa-envelope"></i>
+                        <input type="email" placeholder="E-mail" required>
+                    </div>
+                    
+                    <div class="input-group">
+                        <i class="fas fa-lock"></i>
+                        <input type="password" placeholder="Senha" required>
+                    </div>
+                    
+                    <div class="input-group">
+                        <i class="fas fa-lock"></i>
+                        <input type="password" placeholder="Confirmar senha" required>
+                    </div>
+                    
+                    <div class="input-group">
+                        <i class="fas fa-graduation-cap"></i>
+                        <input type="text" placeholder="Instituição de ensino" required>
+                    </div>
+                    
+                    <button type="submit" class="btn btn-primary">
+                        <i class="fas fa-user-plus" style="margin-right: 8px;"></i>
+                        Criar conta
+                    </button>
+                    
+                    <div class="auth-switch">
+                        <p>Já tem uma conta? <button type="button" onclick="switchToLogin()">Fazer login</button></p>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Alternar entre login e cadastro
+        function switchToSignup() {
+            document.getElementById('loginForm').style.display = 'none';
+            document.getElementById('signupForm').style.display = 'block';
+        }
+        
+        function switchToLogin() {
+            document.getElementById('signupForm').style.display = 'none';
+            document.getElementById('loginForm').style.display = 'block';
+        }
+        
+        // Adicionando event listeners para os formulários
+        document.querySelectorAll('form').forEach(form => {
+            form.addEventListener('submit', function(e) {
+                e.preventDefault();
+                const formType = this.closest('.auth-form').id === 'loginForm' ? 'login' : 'cadastro';
+                alert(`${formType === 'login' ? 'Login' : 'Cadastro'} realizado com sucesso! Redirecionando...`);
+                // Aqui você adicionaria a lógica de login/cadastro e redirecionamento
+            });
+        });
+        
+        // Seleção de tipo de usuário
+        document.querySelectorAll('.user-type').forEach(type => {
+            type.addEventListener('click', function() {
+                document.querySelectorAll('.user-type').forEach(t => t.classList.remove('active'));
+                this.classList.add('active');
+            });
+        });
+    </script>
+</body>
+</html>
